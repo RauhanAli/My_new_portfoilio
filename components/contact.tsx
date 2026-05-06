@@ -1,13 +1,23 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import emailjs from '@emailjs/browser'
 import { Mail, Linkedin, Github, Twitter, FileDown } from 'lucide-react'
+import { motion, useScroll, useTransform } from 'framer-motion'
 
 export function Contact() {
   const [form, setForm] = useState({ name: '', email: '', projectType: '', message: '' })
   const [status, setStatus] = useState<'idle'|'sending'|'success'|'error'>('idle')
   const formRef = useRef<HTMLFormElement>(null)
+  
+  const containerRef = useRef<HTMLDivElement>(null)
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start end", "center center"]
+  })
+
+  const opacity = useTransform(scrollYProgress, [0, 0.7], [0, 1])
+  const y = useTransform(scrollYProgress, [0, 1], ["80px", "0px"])
 
   const handle = (e: React.ChangeEvent<HTMLInputElement|HTMLTextAreaElement>) => setForm(p => ({ ...p, [e.target.name]: e.target.value }))
 
@@ -16,7 +26,6 @@ export function Contact() {
     setStatus('sending')
     
     try {
-      // Replace these placeholders with your actual EmailJS credentials
       await emailjs.send(
         process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || '',
         process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || '',
@@ -38,87 +47,255 @@ export function Contact() {
     }
   }
 
-  const inp: React.CSSProperties = {
-    background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)',
-    color: '#e8f4ff', padding: '13px 16px', fontFamily: "'Inter',sans-serif",
-    fontSize: '0.9rem', outline: 'none', width: '100%', boxSizing: 'border-box', transition: 'border-color 0.2s',
-  }
-  const lbl: React.CSSProperties = { fontFamily: "'Space Mono',monospace", fontSize: '0.68rem', color: 'rgba(232,244,255,0.25)', letterSpacing: '2px', display: 'block', marginBottom: '7px' }
-  const foc = (e: React.FocusEvent<any>) => (e.target.style.borderColor = '#63c5ff')
-  const blr = (e: React.FocusEvent<any>) => (e.target.style.borderColor = 'rgba(255,255,255,0.08)')
-
   const links = [
     { icon: <Mail size={18} strokeWidth={1.5} />, label: 'rauhanali2@gmail.com', href: 'mailto:rauhanali2@gmail.com', target: '_blank', rel: 'noopener noreferrer' },
     { icon: <Linkedin size={18} strokeWidth={1.5} />, label: 'linkedin.com/in/syed-rauhan-ali', href: 'https://www.linkedin.com/in/syed-rauhan-ali-056734178/', target: '_blank', rel: 'noopener noreferrer' },
     { icon: <Github size={18} strokeWidth={1.5} />, label: 'github.com/rauhanali', href: 'https://github.com/rauhanali', target: '_blank', rel: 'noopener noreferrer' },
     { icon: <Twitter size={18} strokeWidth={1.5} />, label: 'x.com/RauhanAli2', href: 'https://x.com/RauhanAli2', target: '_blank', rel: 'noopener noreferrer' },
-    { icon: <FileDown size={18} strokeWidth={1.5} />, label: 'Download Resume (PDF)', href: '/rauhan_blockchain.pdf', target: '_blank', rel: 'noopener noreferrer', download: "Rauhan_Resume.pdf" },
+    // { icon: <FileDown size={18} strokeWidth={1.5} />, label: 'Download Resume (PDF)', href: '/rauhan_blockchain.pdf', target: '_blank', rel: 'noopener noreferrer', download: "Rauhan_Resume.pdf" },
   ]
 
   return (
     <>
       <style>{`
-        .contact-section { background: #020408; padding: 120px 60px; overflow: hidden; }
-        .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+        .contact-section { 
+          background: #000204; 
+          padding: 140px 60px; 
+          position: relative; 
+        }
+
+        .contact-grid { 
+          display: grid; 
+          grid-template-columns: 1.1fr 0.9fr; 
+          gap: 100px; 
+          align-items: start; 
+          max-width: 1400px;
+          margin: 0 auto;
+        }
+
+        .contact-heading {
+          font-family: 'Syne', sans-serif;
+          font-size: clamp(3rem, 6vw, 5.5rem);
+          font-weight: 800;
+          line-height: 1.05;
+          margin-bottom: 24px;
+          color: #ffffff;
+          letter-spacing: -2px;
+        }
+
+        .contact-desc {
+          color: rgba(255,255,255,0.5);
+          font-size: 1.15rem;
+          line-height: 1.8;
+          max-width: 500px;
+          margin-bottom: 48px;
+        }
+
         .contact-link {
-          display: flex; align-items: center; gap: 14px;
-          text-decoration: none; color: rgba(232,244,255,0.5);
-          font-family: 'Space Mono', monospace; font-size: 0.82rem; letter-spacing: 1px;
-          padding: 14px 18px; border: 1px solid rgba(255,255,255,0.08); transition: all 0.2s;
-          word-break: break-all;
+          display: flex; 
+          align-items: center; 
+          gap: 16px;
+          text-decoration: none; 
+          color: rgba(255,255,255,0.6);
+          font-family: 'Space Mono', monospace; 
+          font-size: 0.85rem; 
+          letter-spacing: 1px;
+          padding: 16px 20px; 
+          background: rgba(255,255,255,0.02);
+          border: 1px solid rgba(255,255,255,0.05); 
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+          border-radius: 4px;
         }
-        .contact-link:hover { border-color: #63c5ff; color: #63c5ff; background: rgba(99,197,255,0.1); }
-        .contact-links { display: flex; flex-direction: column; gap: 10px; }
+
+        .contact-link:hover { 
+          border-color: #63c5ff; 
+          color: #ffffff; 
+          background: rgba(99,197,255,0.1); 
+          transform: translateX(10px);
+          box-shadow: 0 10px 30px rgba(99,197,255,0.1);
+        }
+
+        .icon-wrap {
+          color: #63c5ff;
+        }
+        
+        .contact-link:hover .icon-wrap {
+          color: #ffffff;
+        }
+
+        .contact-links { 
+          display: flex; 
+          flex-direction: column; 
+          gap: 12px; 
+        }
+
+        .form-group {
+          margin-bottom: 24px;
+        }
+
+        .contact-label {
+          font-family: 'Space Mono', monospace;
+          font-size: 0.75rem;
+          color: #00ffa3;
+          letter-spacing: 2px;
+          display: block;
+          margin-bottom: 12px;
+        }
+
+        .contact-input {
+          width: 100%;
+          background: transparent;
+          border: none;
+          border-bottom: 1px solid rgba(255,255,255,0.2);
+          color: #ffffff;
+          font-family: 'Inter', sans-serif;
+          font-size: 1.2rem;
+          padding: 12px 0;
+          outline: none;
+          transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        
+        .contact-input::placeholder {
+          color: rgba(255,255,255,0.2);
+        }
+
+        .contact-input:focus {
+          border-bottom-color: #63c5ff;
+          box-shadow: 0 10px 20px -10px rgba(99,197,255,0.2);
+        }
+        
+        textarea.contact-input {
+          min-height: 100px;
+          resize: vertical;
+        }
+
         .form-submit {
-          font-family: 'Space Mono',monospace; font-size: 0.78rem; letter-spacing: 1px;
-          padding: 14px 28px; background: #63c5ff; color: #020408; border: none;
-          cursor: none; font-weight: 700; transition: all 0.2s;
+          display: inline-flex;
+          align-items: center;
+          gap: 12px;
+          font-family: 'Space Mono', monospace; 
+          font-size: 0.85rem; 
+          letter-spacing: 2px;
+          padding: 20px 40px; 
+          background: #ffffff; 
+          color: #000000; 
+          border: none;
+          cursor: crosshair; 
+          font-weight: 700; 
+          transition: all 0.3s;
+          border-radius: 4px;
+          margin-top: 24px;
         }
-        .form-submit:hover { background: #00ffa3; box-shadow: 0 0 40px rgba(0,255,163,0.2); transform: translateY(-2px); }
-        .form-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-        @media (max-width: 900px) {
-          .contact-section { padding: 80px 32px; }
-          .contact-grid { grid-template-columns: 1fr; gap: 48px; }
+
+        .form-submit:hover { 
+          background: #00ffa3; 
+          box-shadow: 0 0 40px rgba(0,255,163,0.3); 
+          transform: translateY(-4px); 
         }
+
+        .form-submit:disabled { 
+          opacity: 0.5; 
+          pointer-events: none; 
+        }
+
+        @media (max-width: 1024px) {
+          .contact-section { padding: 100px 40px; }
+          .contact-grid { grid-template-columns: 1fr; gap: 80px; }
+        }
+
         @media (max-width: 480px) {
-          .contact-section { padding: 60px 20px; }
-          .contact-link { font-size: 0.74rem; padding: 12px 14px; }
+          .contact-section { padding: 80px 24px; }
+          .contact-link { font-size: 0.75rem; padding: 14px 16px; }
         }
       `}</style>
 
-      <section id="contact" className="contact-section">
-        <div className="contact-grid">
-          {/* Left */}
+      <section id="contact" ref={containerRef} className="contact-section">
+        <motion.div className="contact-grid" style={{ opacity, y }}>
+          
+          {/* Left Side */}
           <div>
             <div className="section-label">CONTACT</div>
-            <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 'clamp(1.8rem,3.5vw,3rem)', fontWeight: 800, lineHeight: 1.1, marginBottom: '18px', color: '#e8f4ff' }}>
-              Let&#39;s Build Something <span style={{ color: '#63c5ff' }}>Great.</span>
+            <h2 className="contact-heading">
+              Let&#39;s build something <br/><span style={{ color: '#00ffa3' }}>impactful.</span>
             </h2>
-            <p style={{ color: 'rgba(232,244,255,0.5)', lineHeight: 1.8, marginBottom: '36px', fontSize: '0.92rem' }}>
-              Whether you&#39;re building a DeFi protocol, scaling a platform, or solving a problem nobody else can crack. I want to hear about it. I take on select freelance engagements and am open to founding engineer / lead roles at the right company.
+            <p className="contact-desc">
+              Whether you&#39;re building a DeFi protocol, scaling a platform, or solving a problem nobody else can crack. I want to hear about it. I take on select freelance engagements and am open to lead roles.
             </p>
+            
             <div className="contact-links">
-              {links.map(l => <a key={l.label} href={l.href} target={l.target} rel={l.rel} download={l?.download} className="contact-link"><span style={{ fontSize: '1.1rem', flexShrink: 0 }}>{l.icon}</span>{l.label}</a>)}
+              {links.map((l, i) => (
+                <motion.a 
+                  key={l.label} 
+                  href={l.href} 
+                  target={l.target} 
+                  rel={l.rel} 
+                  // download={l?.download} 
+                  className="contact-link"
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: i * 0.1 }}
+                >
+                  <span className="icon-wrap">{l.icon}</span>
+                  {l.label}
+                </motion.a>
+              ))}
             </div>
           </div>
 
-          {/* Right: Form */}
-          <form ref={formRef} onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            <div><label style={lbl}>YOUR NAME</label><input name="name" value={form.name} onChange={handle} required placeholder="Sarah Chen" style={inp} onFocus={foc} onBlur={blr} /></div>
-            <div><label style={lbl}>EMAIL</label><input type="email" name="email" value={form.email} onChange={handle} required placeholder="sarah@startup.io" style={inp} onFocus={foc} onBlur={blr} /></div>
-            <div><label style={lbl}>PROJECT TYPE</label><input name="projectType" value={form.projectType} onChange={handle} required placeholder="DeFi Protocol / Full Stack / Audit" style={inp} onFocus={foc} onBlur={blr} /></div>
-            <div><label style={lbl}>TELL ME MORE</label>
-              <textarea name="message" value={form.message} onChange={handle} required rows={5} placeholder="What are you building? What's the problem you're solving?" style={{ ...inp, resize: 'vertical', minHeight: '130px' }} onFocus={foc} onBlur={blr} />
+          {/* Right Side: Form */}
+          <motion.form 
+            ref={formRef} 
+            onSubmit={submit}
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <div className="form-group">
+              <label className="contact-label">01 // YOUR NAME</label>
+              <input name="name" value={form.name} onChange={handle} required placeholder="Sarah Chen" className="contact-input" />
+            </div>
+            
+            <div className="form-group">
+              <label className="contact-label">02 // EMAIL</label>
+              <input type="email" name="email" value={form.email} onChange={handle} required placeholder="sarah@startup.io" className="contact-input" />
+            </div>
+            
+            <div className="form-group">
+              <label className="contact-label">03 // PROJECT TYPE</label>
+              <input name="projectType" value={form.projectType} onChange={handle} required placeholder="DeFi Protocol / Web3 App / Audit" className="contact-input" />
+            </div>
+            
+            <div className="form-group">
+              <label className="contact-label">04 // THE DETAILS</label>
+              <textarea name="message" value={form.message} onChange={handle} required placeholder="What are you building? What's the problem you're trying to solve?" className="contact-input" />
             </div>
 
-            {status === 'success' && <div style={{ padding: '10px 14px', background: 'rgba(0,255,163,0.1)', border: '1px solid rgba(0,255,163,0.2)', color: '#00ffa3', fontFamily: "'Space Mono',monospace", fontSize: '0.78rem' }}>✓ Message sent! I&apos;ll be in touch soon.</div>}
-            {status === 'error' && <div style={{ padding: '10px 14px', background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)', color: '#ef4444', fontFamily: "'Space Mono',monospace", fontSize: '0.78rem' }}>✗ Something went wrong. Please try again.</div>}
+            {status === 'success' && (
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                style={{ padding: '16px', background: 'rgba(0,255,163,0.1)', border: '1px solid #00ffa3', color: '#00ffa3', fontFamily: "'Space Mono',monospace", fontSize: '0.85rem', borderRadius: '4px' }}
+              >
+                ✓ Message sent! I'll be in touch within 24 hours.
+              </motion.div>
+            )}
+            
+            {status === 'error' && (
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                style={{ padding: '16px', background: 'rgba(239,68,68,0.1)', border: '1px solid #ef4444', color: '#ef4444', fontFamily: "'Space Mono',monospace", fontSize: '0.85rem', borderRadius: '4px' }}
+              >
+                ✗ Error sending message. Please try emailing directly.
+              </motion.div>
+            )}
 
             <button type="submit" disabled={status==='sending'} className="form-submit">
               {status === 'sending' ? 'SENDING...' : 'SEND MESSAGE →'}
             </button>
-          </form>
-        </div>
+          </motion.form>
+          
+        </motion.div>
       </section>
     </>
   )

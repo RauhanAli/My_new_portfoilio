@@ -6,11 +6,12 @@ import { Hero } from '@/components/hero'
 import { About } from '@/components/about'
 import { Projects } from '@/components/projects'
 import { Skills } from '@/components/skills'
-import { Experience } from '@/components/experience'
+// import { Experience } from '@/components/experience'
 import { Testimonials } from '@/components/testimonials'
 import { Contact } from '@/components/contact'
 import { Footer } from '@/components/footer'
 import { ScrollToTop } from '@/components/scroll-to-top'
+import { Preloader } from '@/components/preloader'
 
 function CursorAndNoise() {
   const cursorRef = useRef<HTMLDivElement>(null)
@@ -84,13 +85,14 @@ function CursorAndNoise() {
 export default function Home() {
   return (
     <main style={{ minHeight: '100vh', background: '#020408' }}>
+      <Preloader />
       <CursorAndNoise />
       <Navbar />
       <Hero />
       <About />
       <Projects />
       <Skills />
-      <Experience />
+      {/* <Experience /> */}
       <Testimonials />
       <Contact />
       <Footer />

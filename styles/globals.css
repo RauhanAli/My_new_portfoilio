@@ -115,6 +115,10 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+.tag-glow {
+  box-shadow: 0 0 20px rgba(0, 217, 255, 0.15);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
